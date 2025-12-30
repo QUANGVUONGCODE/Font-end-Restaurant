@@ -4,7 +4,6 @@ import { toast } from 'sonner';
 import { checkTokenValidity } from '../../utils/user';
 import { checkAndRefreshToken } from '../../utils/TokenManager';
 
-
 /* ================== INTERFACES ================== */
 interface Table {
   id: number;
@@ -170,8 +169,8 @@ const Reservation = () => {
     (sum, i) => sum + i.price * i.quantity,
     0
   );
-  const tax = Math.round(subtotal * 0.1);
-  const total = subtotal + tax;
+  // Total is the same as subtotal
+  const total = subtotal;
 
   /* ================== INPUT ================== */
   const handleInputChange = (
@@ -200,7 +199,7 @@ const Reservation = () => {
       return;
     }
 
-    if (paymentId !== 1 && paymentId !== 3) {
+    if (paymentId !== 1 && paymentId !== 2) {
       toast.error('❌ Phương thức thanh toán không hợp lệ. Vui lòng chọn phương thức thanh toán.');
       return;
     }
@@ -252,15 +251,13 @@ const Reservation = () => {
           }),
         });
         if (orderRes.ok) {
-          // Chuyển khoản ngân hàng, sẽ xử lý thanh toán thành công và quay về trang chủ
           toast.success('✅ Đặt bàn thành công.');
           localStorage.removeItem('cart'); // Xóa giỏ hàng sau khi đặt bàn thành công
           setTimeout(() => {
             goToHome(); // Quay về trang chủ sau khi thành công
           }, 2000);
         }
-      } else if (paymentId === 3) {
-        // Momo hoặc VNPay, gọi API thanh toán
+      } else if (paymentId === 2) {
         const paymentRes = await fetch('http://localhost:8080/restaurant/api/v1/payments/create_payment_url', {
           method: 'POST',
           headers: {
@@ -278,7 +275,6 @@ const Reservation = () => {
 
         if (paymentData.status === 'OK') {
           const txnRef = new URL(paymentData.data).searchParams.get('vnp_TxnRef');
-          // Tiến hành tạo đơn hàng và lưu vnp_TxnRef vào đơn hàng
           const orderRes = await fetch('http://localhost:8080/restaurant/api/v1/order', {
             method: 'POST',
             headers: {
@@ -292,8 +288,7 @@ const Reservation = () => {
           });
 
           if (orderRes.ok) {
-            // Chuyển hướng người dùng đến URL thanh toán
-            window.location.href = paymentData.data; // Chuyển hướng người dùng tới URL thanh toán
+            window.location.href = paymentData.data;
           } else {
             toast.error('❌ Lỗi khi tạo đơn hàng');
           }
@@ -483,10 +478,6 @@ const Reservation = () => {
             <div className="flex justify-between">
               <span>Tạm tính</span>
               <span>{subtotal.toLocaleString()} đ</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Thuế (10%)</span>
-              <span>{tax.toLocaleString()} đ</span>
             </div>
             <div className="flex justify-between font-bold text-lg">
               <span>Tổng</span>

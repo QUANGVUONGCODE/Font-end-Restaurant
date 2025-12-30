@@ -47,6 +47,15 @@ const Sidebar = () => {
           </div>
         </li>
 
+        <li className={`p-4 rounded-lg transition duration-300 cursor-pointer ${activeItem === 'sections' ? 'bg-blue-200' : 'hover:bg-blue-200'}`}>
+          <div 
+            className="flex justify-between items-center text-sm font-medium"
+            onClick={() => handleSetActiveItem('sections')}
+          >
+            <Link to="/admin/sections" className="text-sm font-medium">Thành phần</Link>
+          </div>
+        </li>
+
         {/* Thực đơn dropdown */}
         <li
           onClick={toggleFoodsDropdown}

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-/* ================= TYPES ================= */
 interface Blog {
     id: number;
     title: string;
@@ -17,7 +16,6 @@ const BlogDetailPage = () => {
     const [images, setImages] = useState<string[]>([]);
     const [loading, setLoading] = useState(true);
 
-    /* ================= FETCH BLOG ================= */
     const fetchBlogDetail = async () => {
         const res = await fetch(
             `http://localhost:8080/restaurant/api/v1/blog/${id}`

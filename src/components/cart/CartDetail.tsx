@@ -152,8 +152,8 @@ const CartDetail = () => {
     (sum, item) => sum + item.price * item.quantity,
     0
   );
-  const tax = Math.round(subtotal * 0.1);
-  const total = subtotal + tax;
+  // Bỏ thuế và hiển thị tổng tiền gốc (subtotal)
+  const total = subtotal;
 
   /* ================= UI ================= */
   return (
@@ -228,11 +228,6 @@ const CartDetail = () => {
             <div className="flex justify-between mb-4">
               <span>Tạm tính</span>
               <span>{subtotal.toLocaleString()} đ</span>
-            </div>
-
-            <div className="flex justify-between mb-4">
-              <span>Thuế (10%)</span>
-              <span>{tax.toLocaleString()} đ</span>
             </div>
 
             <div className="flex justify-between text-xl font-bold border-t pt-4 mb-6">

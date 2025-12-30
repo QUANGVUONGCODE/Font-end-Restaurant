@@ -10,20 +10,17 @@ const PaymentCallback = () => {
     const location = useLocation();
     const [paymentStatus, setPaymentStatus] = useState<string | null>(null);
     const [orderInfo, setOrderInfo] = useState<any>(null); // Lưu thông tin đơn hàng
-    const [token, setToken] = useState<string | null>(null);
+
+
     // Lấy các tham số từ query string của URL
     const queryParams = new URLSearchParams(location.search);
     const txnRef = queryParams.get('vnp_TxnRef');
     const amount = queryParams.get('vnp_Amount');
     const responseCode = queryParams.get('vnp_ResponseCode');
-    const orderId = queryParams.get('vnp_OrderInfo');  // Giả sử hệ thống thanh toán trả về thông tin đơn hàng
-    useEffect(() => {
-        const fetchToken = async () => {
-            const token = await checkAndRefreshToken();
-            setToken(token);
-        };
-        fetchToken();
-    }, []);
+    const orderInfoParam = queryParams.get('vnp_OrderInfo');  // Lấy thông tin đơn hàng từ vnp_OrderInfo
+
+
+    // Xử lý callback khi có tham số từ URL
     useEffect(() => {
         if (txnRef && amount && responseCode) {
             handlePaymentCallback(txnRef, amount, responseCode);
@@ -32,21 +29,27 @@ const PaymentCallback = () => {
         }
     }, [txnRef, amount, responseCode]);
 
+    // Lấy OrderId từ vnp_OrderInfo (số sau '%3A')
+    const extractOrderId = (orderInfo: string | null) => {
+        const match = orderInfo?.match(/Thanh\+toan\+don\+hang%3A(\d+)/);
+        return match ? match[1] : null;
+    };
+
     // Xử lý kết quả thanh toán
     const handlePaymentCallback = (txnRef: string, amount: string, responseCode: string) => {
         if (responseCode === '00') {
             setPaymentStatus('Thanh toán thành công!');
             toast.success('✅ Thanh toán thành công.');
 
-            // Giả sử thông tin đơn hàng là chuỗi JSON, bạn có thể parse nó để lấy thông tin
-            try {
-                const parsedOrderInfo = JSON.parse(orderId || '{}');
-                setOrderInfo(parsedOrderInfo);
-            } catch (error) {
-                console.error('Lỗi khi phân tích thông tin đơn hàng:', error);
+            // Lấy orderId từ orderInfoParam
+            const orderId = extractOrderId(orderInfoParam);
+            if (orderId) {
+                setOrderInfo({ orderId }); // Lưu thông tin orderId
+            } else {
+                toast.error('❌ Không thể lấy thông tin đơn hàng');
             }
 
-            // Gọi API để xử lý kết quả thanh toán và sau đó xóa giỏ hàng
+            
             callPaymentResultAPI(txnRef);
         } else {
             setPaymentStatus('Thanh toán thất bại.');
@@ -56,6 +59,7 @@ const PaymentCallback = () => {
 
     // Hàm gọi API callback để xử lý thanh toán và xóa giỏ hàng
     const callPaymentResultAPI = async (txnRef: string) => {
+        const token = await checkAndRefreshToken();
         try {
             const res = await fetch(`http://localhost:8080/restaurant/api/v1/payments/result/${txnRef}`, {
                 method: 'POST',
@@ -64,8 +68,9 @@ const PaymentCallback = () => {
                     Authorization: `Bearer ${token}`,
                 },
             });
-
             const data = await res.json();
+            debugger;
+
             if (data.code === 0) {
                 toast.success('✅ Kết quả thanh toán đã được xử lý thành công.');
 

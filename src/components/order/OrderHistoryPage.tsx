@@ -17,6 +17,7 @@ import {
   ShoppingBag,
 } from 'lucide-react';
 import OrderDetailModal from './OrderDetail';
+import { useNavigation } from '../../utils/navagation';
 
 interface Order {
   id: number;
@@ -47,7 +48,7 @@ const OrderHistoryPage = () => {
   const [filter, setFilter] = useState<string>('all'); // Trạng thái lọc đơn hàng
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null);
-
+  const {goToMenu} = useNavigation();
   useEffect(() => {
     const fetchOrderHistory = async () => {
       const userId = getUserId();
@@ -221,7 +222,9 @@ const OrderHistoryPage = () => {
               Chưa có đơn hàng nào
             </h3>
             <p className="text-gray-600 mb-8">Bạn chưa có đơn hàng nào trong danh sách này</p>
-            <button className="px-8 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full font-medium hover:shadow-lg transition-all duration-300 transform hover:scale-105">
+            <button 
+              onClick={goToMenu} 
+              className="px-8 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full font-medium hover:shadow-lg transition-all duration-300 transform hover:scale-105">
               Đặt món ngay
             </button>
           </div>

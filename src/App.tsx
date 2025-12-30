@@ -29,6 +29,7 @@ import CommentSection from './components/dashboard/CommentDashboard';
 import UserList from './components/dashboard/UserDashBoard';
 import UserInfoPage from './loggin/Infor';
 import Profile from './pages/Profile';
+import SectionDashboardPage from './components/dashboard/SectionsDashboard';
 
 
 // Wrapper animation cho từng page
@@ -246,6 +247,15 @@ const AnimatedRoutes = () => {
             <PageTransition>
               <Sidebar />
               <UserList />
+            </PageTransition>
+          }
+        />
+        <Route
+          path='/admin/sections'
+          element={
+            <PageTransition>
+              <Sidebar />
+              <SectionDashboardPage />
             </PageTransition>
           }
         />
